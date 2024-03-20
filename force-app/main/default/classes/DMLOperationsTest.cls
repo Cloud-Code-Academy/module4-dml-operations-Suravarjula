@@ -177,7 +177,7 @@ public with sharing class DMLOperationsTest {
         }
     
         // Call the method to test again to check the upsert operation
-        DMLOperations.upsertOpportunities(accountName, oppNames);
+       DMLOperations.upsertOpportunities(accountName, oppNames);
     
         // Retrieve the updated Opportunities from the database
         List<Opportunity> updatedOpps = [SELECT Id, Name FROM Opportunity WHERE AccountId = :retrievedAcc.Id];
