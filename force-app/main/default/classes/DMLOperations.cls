@@ -172,23 +172,33 @@ public with sharing class DMLOperations {
     public static void upsertOpportunities(String accountName, List<String> oppNames) {
         List<Opportunity> oppList = new List<Opportunity>();
         // Loop through each Opportunity name
-        System.debug('Account Name passed : ' + accountName + ' and opportunity names : ' + oppNames);
         for (String oppName : oppNames) {
             // Create an Opportunity with the given name
             // Add the Opportunity to the list
             Account[] acct = [select Id from Account where Name = :accountName];
-            System.debug('Status of account object array is : ' + acct.size().toString());
+            
             if(acct.size() == 0) {
                 acct = new Account[1];
-                System.debug('Size of acct object array : ' + acct.size().toString());
                 acct[0] = new Account(Name = accountName);
                 insert acct[0];
                 System.debug('Size of acct object array after account creation : ' + acct.size().toString());
             }
-            Opportunity newOpp = new Opportunity(Name = oppName, AccountId = acct[0].Id, StageName = 'Prospecting', CloseDate = Date.today().addMonths(4));
-            oppList.add(newOpp);
+            Opportunity[] newOpp = [Select Id, Name, AccountId, StageName, CloseDate from Opportunity where Name = :oppName];
+            
+            if(newOpp.size() == 0) {
+                newOpp = new Opportunity[1];
+                newOpp[0] = new Opportunity(Name = oppName, AccountId = acct[0].Id, StageName = 'Prospecting', CloseDate = Date.today().addMonths(4));
+            }
+            else {
+                newOpp[0].Name = oppName;
+                newOpp[0].AccountId = acct[0].Id;
+                newOpp[0].StageName = 'Prospecting';
+                newOpp[0].CloseDate = Date.today().addMonths(4);
+            }
+
+            oppList.add(newOpp[0]);
         }
-        System.debug('Opp List Count : ' + oppList.size());
+        
         upsert oppList;
     }
     
