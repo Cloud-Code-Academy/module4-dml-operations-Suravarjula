@@ -181,7 +181,6 @@ public with sharing class DMLOperations {
                 acct = new Account[1];
                 acct[0] = new Account(Name = accountName);
                 insert acct[0];
-                System.debug('Size of acct object array after account creation : ' + acct.size().toString());
             }
             Opportunity[] newOpp = [Select Id, Name, AccountId, StageName, CloseDate from Opportunity where Name = :oppName];
             
@@ -242,21 +241,18 @@ public with sharing class DMLOperations {
 	 */
 	public static void upsertAccountsWithContacts(List<Contact> contactsToUpsert) {
 		// Loop through each Contact
-        System.debug('List of Contacts received : ' + contactsToUpsert.toString());
         for (Contact contactRecord : contactsToUpsert) {
 		// Extract the Account Name from Contact's LastName
             Account[] contactAccount = [Select Id from Account where Name = :contactRecord.LastName];
-        System.debug('Contact Account Array Size : ' + contactAccount.size());
 
 		// Get the account based on the name or create one if it doesn't exist
             if(contactAccount.size() == 0 ){
                 contactAccount = new Account[1];
                 contactAccount[0] = upsertAccount(contactRecord.LastName);
             }
-        System.debug('Contact Account Array Size - 2nd time : ' + contactAccount.size());
+
         // Link the Contact to its Account using the Account Id        
-        contactRecord.AccountId = contactAccount[0].Id;
-        
+            contactRecord.AccountId = contactAccount[0].Id;
         }
 
 		// Upsert the Contacts
